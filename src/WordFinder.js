@@ -34,6 +34,9 @@ const WORD_SCORES = {
 
 export default class WordFinder {
 
+  static get WORD_SCORES() {
+    return WORD_SCORES;
+  }
 
   constructor(letters, wordList) {
     this.letters = letters
@@ -50,12 +53,14 @@ export default class WordFinder {
       console.log('Thow away:' + variation.excludedLetter)
   
       const validWords = this.findValidWords(variation.includedLetters)
-
-      const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords )
-      topWords.push({ ...bestWord, throwaway: variation.excludedLetter })
+      if(validWords.length > 0) {
+        const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords )
+        topWords.push({ ...bestWord, throwaway: variation.excludedLetter })
+      }
+     
     })
 
-    return topWords.sort(this.compareWordScores)[0]
+    return topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : []
   }
 
   findValidWords(letters) {
@@ -107,12 +112,12 @@ export default class WordFinder {
 
     console.log(JSON.stringify(topGroups))
     
-    const topWords = validWordsWithScore.slice(0, this.RESULT_SIZE)
+    const topWord = validWordsWithScore[0]
 
-    if (topWords[0].score < topGroups[0].score)
+    if (topWord.score < topGroups[0]?.score)
       return topGroups[0]
 
-    return topWords[0]
+    return { words: [topWord.word], score: topWord.score }
   }
 
   getThrowawayVariations() {
