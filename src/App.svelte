@@ -1,65 +1,66 @@
 <script>
   import svelteLogo from './assets/svelte.svg'
+  import LetterCard from './lib/LetterCard.svelte'
   import scrabbleWordList from './scrabble_word_list.json'
   import WordFinder from './WordFinder'
 
 
   let letters = ''
-let words = []
+let bestWord = {}
+
+let bestWordLetters = ''
+
+const WORD_SCORES = WordFinder.WORD_SCORES;
+
+const WORD_DELIMITER = '$'
 
 function search() {
   const wordFinder = new WordFinder(letters, scrabbleWordList)
 
- words = wordFinder.getBestWords()
+  bestWord = wordFinder.getBestWords()
+  bestWordLetters = bestWord.words.join(WORD_DELIMITER)
+  
 }
 
 
 </script>
 
-<main>
-  <div>
-    <a href="https://vitejs.dev" target="_blank"> 
-      <img src="/vite.svg" class="logo" alt="Vite Logo" />
-    </a>
-    <a href="https://svelte.dev" target="_blank"> 
-      <img src={svelteLogo} class="logo svelte" alt="Svelte Logo" />
-    </a>
-  </div>
-  <h1>Vite + Svelte</h1>
+<main class="flex flex-col w-screen items-center justify-center">
+  <h1 class="p-10 celtic-font text-4xl text-center leading-relaxed tracking-widest">quiddler word finder</h1>
 
-  <div class="card">
-    <input bind:value={letters}>
-    <button on:click={search}>
-      Click me
+  <div class="flex flex-col w-1/3 [&>*]:m-3">
+    <input class="h-10 rounded" bind:value={letters}>
+    <button class="inline-block px-4 py-3
+    text-sm font-semibold text-center
+    text-white uppercase transition
+    duration-200 ease-in-out bg-indigo-600 
+    rounded-md cursor-pointer
+    hover:bg-indigo-700" on:click={search}>
+      Find Words
     </button>
   </div>
 
-  <code>
-    {JSON.stringify(words)}
-  </code>
+  
+<div class="flex gap-4 pt-12">
+  {#each bestWordLetters as l}
+  {#if l !== WORD_DELIMITER}
+  <LetterCard letter={l} score={WORD_SCORES[l]}></LetterCard>
+	
+  {:else}
+   <div class="w-8"></div>
+{/if}
+  
+{/each}
 
-  <p>
-    Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank">SvelteKit</a>, the official Svelte app framework powered by Vite!
-  </p>
+</div>
 
-  <p class="read-the-docs">
-    Click on the Vite and Svelte logos to learn more
-  </p>
+<code class="mt-20">
+  {JSON.stringify(bestWord)}
+</code>
+
+
 </main>
 
 <style>
-  .logo {
-    height: 6em;
-    padding: 1.5em;
-    will-change: filter;
-  }
-  .logo:hover {
-    filter: drop-shadow(0 0 2em #646cffaa);
-  }
-  .logo.svelte:hover {
-    filter: drop-shadow(0 0 2em #ff3e00aa);
-  }
-  .read-the-docs {
-    color: #888;
-  }
+
 </style>
