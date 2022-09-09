@@ -51,11 +51,11 @@ export default class WordFinder {
   
       const validWords = this.findValidWords(variation.includedLetters)
 
-      const bestWords = this.getWordsWithHighestScore(variation.includedLetters, validWords )
-      topWords.push(bestWords)
+      const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords )
+      topWords.push({ ...bestWord, throwaway: variation.excludedLetter })
     })
 
-    return topWords
+    return topWords.sort(this.compareWordScores)[0]
   }
 
   findValidWords(letters) {
@@ -76,7 +76,7 @@ export default class WordFinder {
 
   }
 
-  getWordsWithHighestScore(letters, validWords) {
+  getWordWithHighestScore(letters, validWords) {
     const validWordsWithScore = this.getValidWordsWithScore(validWords)
     const letterGroups = []
     for (const wordScore of validWordsWithScore) {
@@ -106,9 +106,13 @@ export default class WordFinder {
     const topGroups = filteredGroups.sort(this.compareWordScores)
 
     console.log(JSON.stringify(topGroups))
+    
     const topWords = validWordsWithScore.slice(0, this.RESULT_SIZE)
 
-    return topWords
+    if (topWords[0].score < topGroups[0].score)
+      return topGroups[0]
+
+    return topWords[0]
   }
 
   getThrowawayVariations() {
