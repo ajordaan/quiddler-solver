@@ -1,6 +1,15 @@
 <script>
   import svelteLogo from './assets/svelte.svg'
   import Counter from './lib/Counter.svelte'
+  import scrabbleWordList from './scrabble_word_list.json'
+  import WordFinder from './WordFinder'
+
+
+const wordFinder = new WordFinder('tousbez', scrabbleWordList)
+
+const words = wordFinder.getBestWords()
+
+
 </script>
 
 <main>
@@ -17,6 +26,10 @@
   <div class="card">
     <Counter />
   </div>
+
+  <code>
+    {JSON.stringify(words)}
+  </code>
 
   <p>
     Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank">SvelteKit</a>, the official Svelte app framework powered by Vite!
