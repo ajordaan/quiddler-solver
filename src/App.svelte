@@ -1,13 +1,17 @@
 <script>
   import svelteLogo from './assets/svelte.svg'
-  import Counter from './lib/Counter.svelte'
   import scrabbleWordList from './scrabble_word_list.json'
   import WordFinder from './WordFinder'
 
 
-const wordFinder = new WordFinder('tousbez', scrabbleWordList)
+  let letters = ''
+let words = []
 
-const words = wordFinder.getBestWords()
+function search() {
+  const wordFinder = new WordFinder(letters, scrabbleWordList)
+
+ words = wordFinder.getBestWords()
+}
 
 
 </script>
@@ -24,7 +28,10 @@ const words = wordFinder.getBestWords()
   <h1>Vite + Svelte</h1>
 
   <div class="card">
-    <Counter />
+    <input bind:value={letters}>
+    <button on:click={search}>
+      Click me
+    </button>
   </div>
 
   <code>
