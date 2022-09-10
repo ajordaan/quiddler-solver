@@ -26,7 +26,7 @@ function search() {
 </script>
 
 <main class="flex flex-col w-screen items-center justify-center">
-  <h1 class="p-10 celtic-font text-4xl text-center leading-relaxed tracking-widest">quiddler word finder</h1>
+  <h1 class="p-10 celtic-font text-4xl text-center leading-relaxed tracking-widest">quiddler solver</h1>
 
   <div class="flex flex-col w-1/3 [&>*]:m-3">
     <input class="h-10 rounded" bind:value={letters}>
