@@ -1,5 +1,6 @@
 {
   "name": "quiddler-solver",
+  "description": "Find the combination of words that gives you the highest score in Quiddler",
   "private": true,
   "version": "0.0.0",
   "type": "module",
