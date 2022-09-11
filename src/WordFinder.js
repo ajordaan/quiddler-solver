@@ -34,8 +34,14 @@ const WORD_SCORES = {
 
 export default class WordFinder {
 
+  static id = 1
+
   static get WORD_SCORES() {
     return WORD_SCORES;
+  }
+
+  static uid() {
+    return this.id++
   }
 
   constructor(letters, wordList) {
@@ -48,9 +54,9 @@ export default class WordFinder {
     const variations = this.getThrowawayVariations()
     const topWords = []
     variations.forEach(variation => {
-      console.log('   ------------------------------------------   ')
-      console.log('Letters: ' + variation.includedLetters)
-      console.log('Thow away:' + variation.excludedLetter)
+      // console.log('   ------------------------------------------   ')
+      // console.log('Letters: ' + variation.includedLetters)
+      // console.log('Thow away:' + variation.excludedLetter)
   
       const validWords = this.findValidWords(variation.includedLetters)
       if(validWords.length > 0) {
@@ -73,10 +79,10 @@ export default class WordFinder {
     const allPermutations = this.getAllPermutations(combinations)
 
 
-    console.log({ allPermutations: allPermutations.length })
+    // console.log({ allPermutations: allPermutations.length })
     
     const validWords = allPermutations.filter(perm => this.validWord(perm.join('')))
-    console.log({ validWords: validWords })
+    // console.log({ validWords: validWords })
     return validWords
 
   }
@@ -93,9 +99,9 @@ export default class WordFinder {
       }
       const groups = this.buildWordGroup(letters, remainingLetters, validWordsWithScore, [wordScore])
       if (groups && groups.length > 1) {
-        console.log(' ---------- GROUP -----------')
-        console.log(groups)
-        console.log(' ----------------------------')
+        // console.log(' ---------- GROUP -----------')
+        // console.log(groups)
+        // console.log(' ----------------------------')
         letterGroups.push(groups)
       }
 
@@ -104,20 +110,22 @@ export default class WordFinder {
     const filteredGroups = letterGroups.map(group => {
       const groupScore = group.reduce((total, wordScore) => total += wordScore.score, 0)
       const groupWords = group.map(wordScore => wordScore.word)
-      return { words: groupWords, score: groupScore }
+      return { id: WordFinder.uid(), words: groupWords, score: groupScore }
 
     })
 
     const topGroups = filteredGroups.sort(this.compareWordScores)
 
-    console.log(JSON.stringify(topGroups))
+    // console.log(JSON.stringify(topGroups))
     
     const topWord = validWordsWithScore[0]
 
+    // console.log(topWord)
+    // console.log(topGroups[0])
     if (topWord.score < topGroups[0]?.score)
       return topGroups[0]
 
-    return { words: [topWord.word], score: topWord.score }
+    return { id: WordFinder.uid(), words: [topWord.word], score: topWord.score }
   }
 
   getThrowawayVariations() {
@@ -250,29 +258,23 @@ export default class WordFinder {
       let middleIndex = Math.floor((startIndex + endIndex) / 2);
       // Compare Middle Index with Target for match
       if (target === array[middleIndex]) {
-        // console.log("Target was found at index " + middleIndex);
         return true
       }
       // Search Right Side Of Array
       if (target > array[middleIndex]) {
-        // console.log("Searching the right side of Array")
         // Assign Start Index and increase the Index by 1 to narrow search
         startIndex = middleIndex + 1;
       }
       // Search Left Side Of Array
       if (target < array[middleIndex]) {
         // Assign End Index and increase the Index by 1 to narrow search
-        // console.log("Searching the left side of array")
         endIndex = middleIndex - 1;
       }
       // Not found in this iteration of the loop. Looping again.
       else {
-        // console.log("Not Found this loop iteration. Looping another iteration.")
       }
     }
     // If Target Is Not Found
-    // console.log("Target value not found in array");
-
     return false
   }
 }
