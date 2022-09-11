@@ -1,9 +1,9 @@
 <script>
   import svelteLogo from './assets/svelte.svg'
+  import Counter from './lib/Counter.svelte'
   import LetterCard from './lib/LetterCard.svelte'
   import scrabbleWordList from './scrabble_word_list.json'
   import WordFinder from './WordFinder'
-
 
   let letters = ''
 let bestWord = {}
@@ -58,6 +58,7 @@ function search() {
   {JSON.stringify(bestWord)}
 </code>
 
+<Counter></Counter>
 
 </main>
 
