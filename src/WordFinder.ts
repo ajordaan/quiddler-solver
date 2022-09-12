@@ -31,7 +31,8 @@ const WORD_SCORES = {
   th: 9,
   qu: 9
 }
-
+import Hand from './Hand'
+import type { CardLetter, LetterGroup } from './types';
 export default class WordFinder {
 
   static id = 1
@@ -44,29 +45,48 @@ export default class WordFinder {
     return this.id++
   }
 
-  constructor(letters, wordList) {
+  letters: string
+  WORD_LIST: string[]
+  RESULT_SIZE = 5
+
+  constructor(letters: string, wordList) {
     this.letters = letters
     this.WORD_LIST = wordList
-    this.RESULT_SIZE = 5 
   }
 
-  getBestWords() {
+  getPlayableHand() {
     const variations = this.getThrowawayVariations()
     const topWords = []
     variations.forEach(variation => {
-      // console.log('   ------------------------------------------   ')
-      // console.log('Letters: ' + variation.includedLetters)
-      // console.log('Thow away:' + variation.excludedLetter)
   
       const validWords = this.findValidWords(variation.includedLetters)
       if(validWords.length > 0) {
         const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords )
-        topWords.push({ ...bestWord, throwaway: variation.excludedLetter })
+
+        topWords.push({ ...bestWord, playerLetters: variation.includedLetters, throwaway: variation.excludedLetter })
       }
      
     })
+    
+    
+    const topWord =  topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
 
-    return topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : []
+    if(topWord) {
+      const groups: LetterGroup[] = []
+      topWord.words.forEach(w => {
+        const cardLetters: CardLetter[] = []
+        for(let lett of w) {
+          cardLetters.push({id: WordFinder.uid(), character: lett, score: WORD_SCORES[lett]})
+        }
+
+        groups.push({word: cardLetters})
+      })
+     
+      
+      return new Hand(Array.from(topWord.playerLetters).map(lett => {return { id: WordFinder.uid(), character: lett, score: WORD_SCORES[lett]} }),groups, {id: WordFinder.uid(), character: topWord.throwaway, score: WORD_SCORES[topWord.throwaway]})
+
+    }
+
   }
 
   findValidWords(letters) {
@@ -119,6 +139,8 @@ export default class WordFinder {
     // console.log(JSON.stringify(topGroups))
     
     const topWord = validWordsWithScore[0]
+
+    console.log({topWord})
 
     // console.log(topWord)
     // console.log(topGroups[0])
