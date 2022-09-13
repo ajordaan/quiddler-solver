@@ -130,9 +130,9 @@
     {/if}
   </div>
 
-  <div class="flex justify-center flex-wrap gap-2">
-    <h3 class="text-3xl w-full text-center">Words</h3>
-    <div class="flex w-full justify-between md:justify-center flex-wrap gap-8 pt-12">
+  <div class="flex justify-center flex-wrap gap-2 pb-12">
+    <h3 class="text-3xl card-letter-font w-full text-center">Words</h3>
+    <div class="flex w-full justify-between md:justify-center flex-wrap gap-8 pb-10">
         {#each handWords as group}
         <div class="flex gap-2 flex-col md:flex-row">
           {#each group.word as card (card.id)}
@@ -147,8 +147,8 @@
           </div>
         {/each}
     </div>
-    <h3 class="text-3xl w-full text-center">Throwaway</h3>
-    <div class="flex justify-center gap-4 pt-12">
+    <h3 class="text-3xl card-letter-font w-full text-center">Throwaway</h3>
+    <div class="flex justify-center gap-4 pb-10">
     
       {#each playerCards.filter((card) => card.status === CardStatus.THROWAWAY) as card (card.id)}
       <div
@@ -161,8 +161,8 @@
     {/each}
     
     </div>
-    <h3 class="text-3xl w-full text-center">Lose</h3>
-    <div class="flex gap-4 pt-12 flex-wrap w-full justify-center">
+    <h3 class="text-3xl card-letter-font w-full text-center">Lose</h3>
+    <div class="flex gap-4 flex-wrap w-full justify-center pb-10">
         {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
           <div
             in:receive={{ key: card.id }}
