@@ -14,11 +14,3 @@ export interface CardLetter {
 export interface LetterGroup {
   word: CardLetter[]
 }
-
-export interface PlayableHand {
-  words: LetterGroup[]
-  throwaway: CardLetter
-  allCards(): CardLetter[]
-  setLoseCards(): void
-  totalScore(): number
-}

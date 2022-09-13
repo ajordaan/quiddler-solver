@@ -48,7 +48,6 @@
     hand = wordFinder.getPlayableHand();
 
     console.log({ words: hand.words });
-    console.log({ allCards: hand.allCards() });
     console.log({
       loseCards: hand.playerCards.filter(
         (card) => card.status === CardStatus.LOSE
@@ -61,13 +60,12 @@
     bestWordLetters = bestWord.words.join(WORD_DELIMITER);
 
     playerCards = hand.playerCards;
-    allCards = hand.allCards();
     handWords = hand.words;
 
     setTimeout(() => {
-      hand.setLoseCards();
+      hand.setThrowAwayCard();
       hand.setScoredWords();
-      allCards = hand.allCards();
+      hand.setLoseCards();
       playerCards = playerCards;
       handWords = handWords;
     }, 2000);
@@ -120,7 +118,7 @@
 
   <div class="flex gap-4 pt-12">
     {#if hand}
-      {#each allCards.filter((card) => card.status === CardStatus.PENDING) as card (card.id)}
+      {#each playerCards.filter((card) => card.status === CardStatus.PENDING) as card (card.id)}
         <div
           in:receive={{ key: card.id }}
           out:send={{ key: card.id }}
@@ -132,8 +130,8 @@
     {/if}
   </div>
 
+  <h3 class="text-3xl">Words</h3>
   <div class="flex gap-4 pt-12">
-    {#if hand}
       {#each handWords as group}
         {#each group.word as card (card.id)}
           <div
@@ -146,22 +144,25 @@
         {/each}
         <div class="w-8" />
       {/each}
-    {/if}
   </div>
 
-  <!-- <h3 class="text-3xl">Throwaway</h3>
+  <h3 class="text-3xl">Throwaway</h3>
   <div class="flex gap-4 pt-12">
-    {#if hand}
-      <LetterCard
-        letter={hand.throwaway.character}
-        score={hand.throwaway.score}
-      />
-    {/if}
-  </div> -->
+   
+    {#each playerCards.filter((card) => card.status === CardStatus.THROWAWAY) as card (card.id)}
+    <div
+      in:receive={{ key: card.id }}
+      out:send={{ key: card.id }}
+      animate:flip="{{duration: (d) => d * 2000 }}"
+    >
+      <LetterCard letter={card.character} score={card.score} />
+    </div>
+  {/each}
+   
+  </div>
 
   <h3 class="text-3xl">Lose</h3>
   <div class="flex gap-4 pt-12">
-    {#if hand}
       {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
         <div
           in:receive={{ key: card.id }}
@@ -171,16 +172,9 @@
           <LetterCard letter={card.character} score={card.score} />
         </div>
       {/each}
-    {/if}
   </div>
 
-  <code class="mt-20">
-    {JSON.stringify(bestWord)}
-  </code>
 
-  <Counter />
-
-  <div class="mb-32" />
 </main>
 
 <style>

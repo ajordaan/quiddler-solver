@@ -1,21 +1,20 @@
-import { CardLetter, CardStatus, LetterGroup, PlayableHand } from "./types";
+import { CardLetter, CardStatus, LetterGroup } from "./types";
 
-export default class Hand implements PlayableHand {
+export default class Hand {
   words: LetterGroup[];
-  throwaway: CardLetter;
   playerCards: CardLetter[];
   wordsTemp: string[]
+  throwawayTemp: string
   ID = 1
   constructor(playerCardsExcludingThrowaway: string, words: string[], throwawayLetter: string, WORD_SCORES ) {
     console.log('--- HAND ---')
     console.log({playerCardsExcludingThrowaway, words, throwawayLetter})
 
-    this.playerCards = Array.from(playerCardsExcludingThrowaway).map(lett => {return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} })
+    this.playerCards = Array.from(playerCardsExcludingThrowaway + throwawayLetter).map(lett => {return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} })
     this.words = []
    
     this.wordsTemp = words
-    
-    this.throwaway = { id: this.newId(), character: throwawayLetter, score: WORD_SCORES[throwawayLetter], status: CardStatus.THROWAWAY } 
+    this.throwawayTemp = throwawayLetter
   }
 
   setScoredWords() {
@@ -41,8 +40,9 @@ export default class Hand implements PlayableHand {
     })
   }
 
-  allCards() {
-    return [...this.playerCards, this.throwaway]
+  setThrowAwayCard() {
+    const card = this.playerCards.find(c => c.character === this.throwawayTemp)
+    card.status = CardStatus.THROWAWAY
   }
 
   setLoseCards() {
@@ -58,7 +58,7 @@ export default class Hand implements PlayableHand {
     this.playerCards.forEach(card => {
       const index = remainingCards.findIndex(rc => rc.character === card.character)
 
-      if(index > -1) {
+      if(index > -1 && card.status === CardStatus.PENDING) {
         card.status = CardStatus.LOSE
         remainingCards.splice(index, 1)
       }
