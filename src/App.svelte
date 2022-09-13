@@ -1,6 +1,6 @@
 <script lang="ts">
   import { quintOut } from "svelte/easing";
-  import { crossfade } from "svelte/transition";
+  import { crossfade, fade } from "svelte/transition";
   import { flip } from "svelte/animate";
   import type Hand from "./Hand";
   import LetterCard from "./lib/LetterCard.svelte";
@@ -30,10 +30,12 @@
   let hand: Hand = null;
   let playerCards: CardLetter[] = [];
   let handWords: LetterGroup[] = [];
+  let wordFound = false;
 
   function search() {
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
-    
+    clear()
+
     hand = wordFinder.getPlayableHand();
     playerCards = hand.playerCards;
     handWords = hand.words;
@@ -44,9 +46,17 @@
       hand.setLoseCards();
       playerCards = playerCards;
       handWords = handWords;
+      wordFound = true
     }, 2000);
   }
 
+  function clear() {
+     playerLetters = "";
+   hand = null;
+   playerCards = [];
+   handWords = [];
+   wordFound = false;
+  }
 </script>
 
 <main class="flex flex-col p-8 w-screen items-center justify-center">
@@ -77,8 +87,8 @@
         <div
           in:receive={{ key: card.id }}
           out:send={{ key: card.id }}
-          animate:flip="{{duration: (d) => d * 2000 }}"
-          on:introend="{() => console.log('intro ended')}"
+          animate:flip={{ duration: (d) => d * 2000 }}
+          on:introend={() => console.log("intro ended")}
         >
           <LetterCard letter={card.character} score={card.score} />
         </div>
@@ -87,51 +97,55 @@
   </div>
 
   <div class="flex justify-center flex-wrap gap-2 pb-12">
-    <h3 class="text-3xl card-letter-font w-full text-center">Words</h3>
-    <div class="flex w-full justify-between md:justify-center flex-wrap gap-8 pb-10">
-        {#each handWords as group}
+    {#if wordFound}
+    <h3 in:fade class="text-3xl card-letter-font w-full text-center">Words</h3>
+    {/if}
+    <div
+      class="flex w-full justify-between md:justify-center flex-wrap gap-12 pb-10"
+    >
+      {#each handWords as group}
         <div class="flex gap-2 flex-col md:flex-row">
           {#each group.word as card (card.id)}
             <div
               in:receive={{ key: card.id }}
               out:send={{ key: card.id }}
-              animate:flip="{{duration: (d) => d * 2000 }}"
+              animate:flip={{ duration: (d) => d * 2000 }}
             >
               <LetterCard letter={card.character} score={card.score} />
             </div>
           {/each}
-          </div>
-        {/each}
+        </div>
+      {/each}
     </div>
-    <h3 class="text-3xl card-letter-font w-full text-center">Throwaway</h3>
+    {#if wordFound}
+    <h3 in:fade class="text-3xl card-letter-font w-full text-center">Throwaway</h3>
+    {/if}
     <div class="flex justify-center gap-4 pb-10">
-    
       {#each playerCards.filter((card) => card.status === CardStatus.THROWAWAY) as card (card.id)}
-      <div
-        in:receive={{ key: card.id }}
-        out:send={{ key: card.id }}
-        animate:flip="{{duration: (d) => d * 2000 }}"
-      >
-        <LetterCard letter={card.character} score={card.score} />
-      </div>
-    {/each}
-    
+        <div
+          in:receive={{ key: card.id }}
+          out:send={{ key: card.id }}
+          animate:flip={{ duration: (d) => d * 2000 }}
+        >
+          <LetterCard letter={card.character} score={card.score} />
+        </div>
+      {/each}
     </div>
-    <h3 class="text-3xl card-letter-font w-full text-center">Lose</h3>
+    {#if wordFound}
+    <h3 in:fade class="text-3xl card-letter-font w-full text-center">Lose</h3>
+    {/if}
     <div class="flex gap-4 flex-wrap w-full justify-center pb-10">
-        {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
-          <div
-            in:receive={{ key: card.id }}
-            out:send={{ key: card.id }}
-            animate:flip="{{duration: (d) => d * 2000 }}"
-          >
-            <LetterCard letter={card.character} score={card.score} />
-          </div>
-        {/each}
+      {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
+        <div
+          in:receive={{ key: card.id }}
+          out:send={{ key: card.id }}
+          animate:flip={{ duration: (d) => d * 2000 }}
+        >
+          <LetterCard letter={card.character} score={card.score} />
+        </div>
+      {/each}
     </div>
   </div>
-
-
 </main>
 
 <style>
