@@ -32,7 +32,7 @@ const WORD_SCORES = {
   qu: 9
 }
 import Hand from './Hand'
-import type { CardLetter, LetterGroup } from './types';
+import { CardLetter, CardStatus, LetterGroup } from './types';
 export default class WordFinder {
 
   static id = 1
@@ -71,19 +71,19 @@ export default class WordFinder {
     
     const topWord =  topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
 
+    let remainingLetters: string[] = Array.from(topWord.playerLetters)
     if(topWord) {
       const groups: LetterGroup[] = []
       topWord.words.forEach(w => {
         const cardLetters: CardLetter[] = []
         for(let lett of w) {
-          cardLetters.push({id: WordFinder.uid(), character: lett, score: WORD_SCORES[lett]})
+          cardLetters.push({ id: WordFinder.uid(), character: lett, score: WORD_SCORES[lett], status: CardStatus.SCORED })
         }
 
         groups.push({word: cardLetters})
       })
-     
       
-      return new Hand(Array.from(topWord.playerLetters).map(lett => {return { id: WordFinder.uid(), character: lett, score: WORD_SCORES[lett]} }),groups, {id: WordFinder.uid(), character: topWord.throwaway, score: WORD_SCORES[topWord.throwaway]})
+      return new Hand(topWord.playerLetters,topWord.words, topWord.throwaway, WORD_SCORES)
 
     }
 
