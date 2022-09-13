@@ -1,4 +1,25 @@
 <script lang="ts">
+  import { quintOut } from "svelte/easing";
+  import { crossfade } from "svelte/transition";
+  import { flip } from "svelte/animate";
+
+  const [send, receive] = crossfade({
+    duration: (d) => Math.sqrt(d * 4000),
+
+    fallback(node, params) {
+      const style = getComputedStyle(node);
+      const transform = style.transform === "none" ? "" : style.transform;
+
+      return {
+        duration: 600,
+        easing: quintOut,
+        css: (t) => `
+					transform: ${transform} scale(${t});
+					opacity: ${t}
+				`,
+      };
+    },
+  });
   import type Hand from "./Hand";
 
   import Counter from "./lib/Counter.svelte";
@@ -18,34 +39,38 @@
   let playerLetters = "";
   let hand: Hand = null;
   let playerCards: CardLetter[] = [];
-  let allCards: CardLetter[] = []
-  let handWords: LetterGroup[] = []
+  let allCards: CardLetter[] = [];
+  let handWords: LetterGroup[] = [];
 
   function search() {
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
 
     hand = wordFinder.getPlayableHand();
 
-    console.log({words: hand.words});
-    console.log({allCards: hand.allCards()})
-    console.log({loseCards: hand.playerCards.filter(card => card.status === CardStatus.LOSE)})
-    console.log({playerCards: hand.playerCards})
+    console.log({ words: hand.words });
+    console.log({ allCards: hand.allCards() });
+    console.log({
+      loseCards: hand.playerCards.filter(
+        (card) => card.status === CardStatus.LOSE
+      ),
+    });
+    console.log({ playerCards: hand.playerCards });
     console.log("Hand score" + hand.totalScore());
 
     console.log({ hand });
     bestWordLetters = bestWord.words.join(WORD_DELIMITER);
 
-   playerCards = hand.playerCards
-   allCards = hand.allCards()
-   handWords = hand.words
+    playerCards = hand.playerCards;
+    allCards = hand.allCards();
+    handWords = hand.words;
 
     setTimeout(() => {
-      hand.setLoseCards()
-      hand.setScoredWords()
-      allCards = hand.allCards()
-      playerCards = playerCards
-      handWords = handWords
-    }, 2000)
+      hand.setLoseCards();
+      hand.setScoredWords();
+      allCards = hand.allCards();
+      playerCards = playerCards;
+      handWords = handWords;
+    }, 2000);
   }
 
   // // function loseCardsTest(words) {
@@ -79,7 +104,7 @@
   </h1>
 
   <div class="flex flex-col w-1/3 [&>*]:m-3">
-    <input class="h-10 rounded" bind:value={playerLetters} />
+    <input class="h-14 rounded text-3xl" bind:value={playerLetters} />
     <button
       class="inline-block px-4 py-3
     text-sm font-semibold text-center
@@ -93,28 +118,38 @@
     </button>
   </div>
 
-  <h3 class="text-3xl">All Cards</h3>
   <div class="flex gap-4 pt-12">
     {#if hand}
-      {#each allCards.filter(card => card.status === CardStatus.PENDING) as card (card.id)}
-        <LetterCard letter={card.character} score={card.score} />
+      {#each allCards.filter((card) => card.status === CardStatus.PENDING) as card (card.id)}
+        <div
+          in:receive={{ key: card.id }}
+          out:send={{ key: card.id }}
+          animate:flip="{{duration: (d) => d * 2000 }}"
+        >
+          <LetterCard letter={card.character} score={card.score} />
+        </div>
       {/each}
     {/if}
   </div>
 
-  <h3 class="text-3xl">Words</h3>
   <div class="flex gap-4 pt-12">
     {#if hand}
       {#each handWords as group}
         {#each group.word as card (card.id)}
-          <LetterCard letter={card.character} score={card.score} />
+          <div
+            in:receive={{ key: card.id }}
+            out:send={{ key: card.id }}
+            animate:flip="{{duration: (d) => d * 2000 }}"
+          >
+            <LetterCard letter={card.character} score={card.score} />
+          </div>
         {/each}
         <div class="w-8" />
       {/each}
     {/if}
   </div>
 
-  <h3 class="text-3xl">Throwaway</h3>
+  <!-- <h3 class="text-3xl">Throwaway</h3>
   <div class="flex gap-4 pt-12">
     {#if hand}
       <LetterCard
@@ -122,13 +157,19 @@
         score={hand.throwaway.score}
       />
     {/if}
-  </div>
+  </div> -->
 
   <h3 class="text-3xl">Lose</h3>
   <div class="flex gap-4 pt-12">
     {#if hand}
-      {#each playerCards.filter(card => card.status === CardStatus.LOSE) as card (card.id)}
-        <LetterCard letter={card.character} score={card.score} />
+      {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
+        <div
+          in:receive={{ key: card.id }}
+          out:send={{ key: card.id }}
+          animate:flip="{{duration: (d) => d * 2000 }}"
+        >
+          <LetterCard letter={card.character} score={card.score} />
+        </div>
       {/each}
     {/if}
   </div>
@@ -138,6 +179,8 @@
   </code>
 
   <Counter />
+
+  <div class="mb-32" />
 </main>
 
 <style>
