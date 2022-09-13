@@ -2,6 +2,7 @@
 	import { quintOut } from 'svelte/easing';
 	import { crossfade } from 'svelte/transition';
 	import { flip } from 'svelte/animate';
+import TodoItem from './TodoItem.svelte';
 
 	const [send, receive] = crossfade({
 		duration: d => Math.sqrt(d * 200),
@@ -63,15 +64,11 @@
 	<div class='left'>
 		<h2>todo</h2>
 		{#each todos.filter(t => !t.done) as todo (todo.id)}
-			<label
-				in:receive="{{key: todo.id}}"
-				out:send="{{key: todo.id}}"
-				animate:flip
-			>
-				<input type=checkbox on:change={() => mark(todo, true)}>
-				{todo.description}
-				<button on:click="{() => remove(todo)}">remove</button>
-			</label>
+		<div in:receive="{{key: todo.id}}"
+		out:send="{{key: todo.id}}"
+		animate:flip>
+			<TodoItem on:mark={() => mark(todo, true)} on:remove={() => remove(todo)} todo={todo}> </TodoItem>
+		</div>
 		{/each}
 	</div>
 
