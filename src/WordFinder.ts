@@ -71,7 +71,6 @@ export default class WordFinder {
     
     const topWord =  topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
 
-    let remainingLetters: string[] = Array.from(topWord.playerLetters)
     if(topWord) {
       const groups: LetterGroup[] = []
       topWord.words.forEach(w => {

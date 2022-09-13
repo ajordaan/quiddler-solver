@@ -2,7 +2,7 @@
   export let letter;
   export let score;
 
-  let largeLetters = ['z', 'w']
+  let largeLetters = ['z', 'w', 't', 'm']
 </script>
 
 <div
