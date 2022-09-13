@@ -1,8 +1,14 @@
-
+export enum CardStatus {
+  PENDING,
+  SCORED,
+  LOSE,
+  THROWAWAY,
+}
 export interface CardLetter {
   id: number
   character: string
   score: number
+  status: CardStatus
 }
 
 export interface LetterGroup {
@@ -12,6 +18,7 @@ export interface LetterGroup {
 export interface PlayableHand {
   words: LetterGroup[]
   throwaway: CardLetter
-  loseCards(): CardLetter[]
+  allCards(): CardLetter[]
+  setLoseCards(): void
   totalScore(): number
 }
