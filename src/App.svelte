@@ -94,14 +94,14 @@
   // }
 </script>
 
-<main class="flex flex-col w-screen items-center justify-center">
+<main class="flex flex-col p-8 w-screen items-center justify-center">
   <h1
     class="p-10 celtic-font text-4xl text-center leading-relaxed tracking-widest"
   >
     quiddler solver
   </h1>
 
-  <div class="flex flex-col w-1/3 [&>*]:m-3">
+  <div class="flex flex-col lg:w-1/3 [&>*]:m-3">
     <input class="h-14 rounded text-3xl" bind:value={playerLetters} />
     <button
       class="inline-block px-4 py-3
@@ -116,7 +116,7 @@
     </button>
   </div>
 
-  <div class="flex gap-4 pt-12">
+  <div class="flex gap-4 pt-12 flex-wrap w-full justify-center">
     {#if hand}
       {#each playerCards.filter((card) => card.status === CardStatus.PENDING) as card (card.id)}
         <div
@@ -130,10 +130,40 @@
     {/if}
   </div>
 
-  <h3 class="text-3xl">Words</h3>
-  <div class="flex gap-4 pt-12">
-      {#each handWords as group}
-        {#each group.word as card (card.id)}
+  <div class="flex justify-center flex-wrap gap-2">
+    <h3 class="text-3xl w-full text-center">Words</h3>
+    <div class="flex w-full justify-between md:justify-center flex-wrap gap-8 pt-12">
+        {#each handWords as group}
+        <div class="flex gap-2 flex-col md:flex-row">
+          {#each group.word as card (card.id)}
+            <div
+              in:receive={{ key: card.id }}
+              out:send={{ key: card.id }}
+              animate:flip="{{duration: (d) => d * 2000 }}"
+            >
+              <LetterCard letter={card.character} score={card.score} />
+            </div>
+          {/each}
+          </div>
+        {/each}
+    </div>
+    <h3 class="text-3xl w-full text-center">Throwaway</h3>
+    <div class="flex justify-center gap-4 pt-12">
+    
+      {#each playerCards.filter((card) => card.status === CardStatus.THROWAWAY) as card (card.id)}
+      <div
+        in:receive={{ key: card.id }}
+        out:send={{ key: card.id }}
+        animate:flip="{{duration: (d) => d * 2000 }}"
+      >
+        <LetterCard letter={card.character} score={card.score} />
+      </div>
+    {/each}
+    
+    </div>
+    <h3 class="text-3xl w-full text-center">Lose</h3>
+    <div class="flex gap-4 pt-12 flex-wrap w-full justify-center">
+        {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
           <div
             in:receive={{ key: card.id }}
             out:send={{ key: card.id }}
@@ -142,36 +172,7 @@
             <LetterCard letter={card.character} score={card.score} />
           </div>
         {/each}
-        <div class="w-8" />
-      {/each}
-  </div>
-
-  <h3 class="text-3xl">Throwaway</h3>
-  <div class="flex gap-4 pt-12">
-   
-    {#each playerCards.filter((card) => card.status === CardStatus.THROWAWAY) as card (card.id)}
-    <div
-      in:receive={{ key: card.id }}
-      out:send={{ key: card.id }}
-      animate:flip="{{duration: (d) => d * 2000 }}"
-    >
-      <LetterCard letter={card.character} score={card.score} />
     </div>
-  {/each}
-   
-  </div>
-
-  <h3 class="text-3xl">Lose</h3>
-  <div class="flex gap-4 pt-12">
-      {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
-        <div
-          in:receive={{ key: card.id }}
-          out:send={{ key: card.id }}
-          animate:flip="{{duration: (d) => d * 2000 }}"
-        >
-          <LetterCard letter={card.character} score={card.score} />
-        </div>
-      {/each}
   </div>
 
 

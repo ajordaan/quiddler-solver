@@ -38,6 +38,10 @@
   font-family: Celtasmigoria;
 }
 
+.card-center-letter--smaller {
+  font-size: 3rem;
+}
+
 .card-letter-font {
   font-family: Censcbk, serif;
 }
