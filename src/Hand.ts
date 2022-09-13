@@ -7,9 +7,6 @@ export default class Hand {
   throwawayTemp: string
   ID = 1
   constructor(playerCardsExcludingThrowaway: string, words: string[], throwawayLetter: string, WORD_SCORES ) {
-    console.log('--- HAND ---')
-    console.log({playerCardsExcludingThrowaway, words, throwawayLetter})
-
     this.playerCards = Array.from(playerCardsExcludingThrowaway + throwawayLetter).map(lett => {return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} })
     this.words = []
    
@@ -46,7 +43,6 @@ export default class Hand {
   }
 
   setLoseCards() {
-    console.log('set lose cards')
     let remainingCards = [...this.playerCards]
     this.words.forEach(letterGroup => {
       letterGroup.word.forEach(card => {
@@ -72,7 +68,4 @@ export default class Hand {
   newId() {
     return this.ID++
   }
-
-  
-
 }

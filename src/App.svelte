@@ -2,6 +2,11 @@
   import { quintOut } from "svelte/easing";
   import { crossfade } from "svelte/transition";
   import { flip } from "svelte/animate";
+  import type Hand from "./Hand";
+  import LetterCard from "./lib/LetterCard.svelte";
+  import scrabbleWordList from "./scrabble_word_list.json";
+  import { CardLetter, CardStatus, LetterGroup } from "./types";
+  import WordFinder from "./WordFinder";
 
   const [send, receive] = crossfade({
     duration: (d) => Math.sqrt(d * 4000),
@@ -20,45 +25,16 @@
       };
     },
   });
-  import type Hand from "./Hand";
-
-  import Counter from "./lib/Counter.svelte";
-  import LetterCard from "./lib/LetterCard.svelte";
-  import scrabbleWordList from "./scrabble_word_list.json";
-  import { CardLetter, CardStatus, LetterGroup } from "./types";
-  import WordFinder from "./WordFinder";
-
-  let bestWord = { words: [] };
-
-  let bestWordLetters = "";
-
-  const WORD_SCORES = WordFinder.WORD_SCORES;
-
-  const WORD_DELIMITER = "$";
 
   let playerLetters = "";
   let hand: Hand = null;
   let playerCards: CardLetter[] = [];
-  let allCards: CardLetter[] = [];
   let handWords: LetterGroup[] = [];
 
   function search() {
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
-
+    
     hand = wordFinder.getPlayableHand();
-
-    console.log({ words: hand.words });
-    console.log({
-      loseCards: hand.playerCards.filter(
-        (card) => card.status === CardStatus.LOSE
-      ),
-    });
-    console.log({ playerCards: hand.playerCards });
-    console.log("Hand score" + hand.totalScore());
-
-    console.log({ hand });
-    bestWordLetters = bestWord.words.join(WORD_DELIMITER);
-
     playerCards = hand.playerCards;
     handWords = hand.words;
 
@@ -71,27 +47,6 @@
     }, 2000);
   }
 
-  // // function loseCardsTest(words) {
-  // //   console.log('set lose cards')
-  // //   let remainingCards = [...playerCards]
-  // //   words.forEach(letterGroup => {
-  // //     letterGroup.word.forEach(card => {
-  // //       const index = remainingCards.findIndex(rc => rc.character === card.character)
-  // //       index > -1 && remainingCards.splice(index, 1)
-  // //     })
-  // //   })
-
-  //   playerCards.forEach(card => {
-  //     const index = remainingCards.findIndex(rc => rc.character === card.character)
-
-  //     if(index > -1) {
-  //       card.status = CardStatus.LOSE
-  //       remainingCards.splice(index, 1)
-  //     }
-  //   })
-
-  //   playerCards = playerCards;
-  // }
 </script>
 
 <main class="flex flex-col p-8 w-screen items-center justify-center">
@@ -123,6 +78,7 @@
           in:receive={{ key: card.id }}
           out:send={{ key: card.id }}
           animate:flip="{{duration: (d) => d * 2000 }}"
+          on:introend="{() => console.log('intro ended')}"
         >
           <LetterCard letter={card.character} score={card.score} />
         </div>

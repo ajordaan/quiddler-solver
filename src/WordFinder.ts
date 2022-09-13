@@ -140,7 +140,7 @@ export default class WordFinder {
     
     const topWord = validWordsWithScore[0]
 
-    console.log({topWord})
+//    console.log({topWord})
 
     // console.log(topWord)
     // console.log(topGroups[0])
