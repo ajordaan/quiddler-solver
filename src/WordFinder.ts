@@ -58,31 +58,31 @@ export default class WordFinder {
     const variations = this.getThrowawayVariations()
     const topWords = []
     variations.forEach(variation => {
-  
+
       const validWords = this.findValidWords(variation.includedLetters)
-      if(validWords.length > 0) {
-        const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords )
+      if (validWords.length > 0) {
+        const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords)
 
         topWords.push({ ...bestWord, playerLetters: variation.includedLetters, throwaway: variation.excludedLetter })
       }
-     
-    })
-    
-    
-    const topWord =  topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
 
-    if(topWord) {
+    })
+
+
+    const topWord = topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
+
+    if (topWord) {
       const groups: LetterGroup[] = []
       topWord.words.forEach(w => {
         const cardLetters: CardLetter[] = []
-        for(let lett of w) {
+        for (let lett of w) {
           cardLetters.push({ id: WordFinder.uid(), character: lett, score: WORD_SCORES[lett], status: CardStatus.SCORED })
         }
 
-        groups.push({word: cardLetters})
+        groups.push({ word: cardLetters })
       })
-      
-      return new Hand(topWord.playerLetters,topWord.words, topWord.throwaway, WORD_SCORES)
+
+      return new Hand(topWord.playerLetters, topWord.words, topWord.throwaway, WORD_SCORES)
 
     }
 
@@ -99,7 +99,7 @@ export default class WordFinder {
 
 
     // console.log({ allPermutations: allPermutations.length })
-    
+
     const validWords = allPermutations.filter(perm => this.validWord(perm.join('')))
     // console.log({ validWords: validWords })
     return validWords
@@ -136,10 +136,10 @@ export default class WordFinder {
     const topGroups = filteredGroups.sort(this.compareWordScores)
 
     // console.log(JSON.stringify(topGroups))
-    
+
     const topWord = validWordsWithScore[0]
 
-//    console.log({topWord})
+    //    console.log({topWord})
 
     // console.log(topWord)
     // console.log(topGroups[0])

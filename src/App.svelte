@@ -34,7 +34,7 @@
 
   function search() {
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
-    clear()
+    clear();
 
     hand = wordFinder.getPlayableHand();
     playerCards = hand.playerCards;
@@ -46,16 +46,16 @@
       hand.setLoseCards();
       playerCards = playerCards;
       handWords = handWords;
-      wordFound = true
+      wordFound = true;
     }, 2000);
   }
 
   function clear() {
-     playerLetters = "";
-   hand = null;
-   playerCards = [];
-   handWords = [];
-   wordFound = false;
+    playerLetters = "";
+    hand = null;
+    playerCards = [];
+    handWords = [];
+    wordFound = false;
   }
 </script>
 
@@ -98,7 +98,9 @@
 
   <div class="flex justify-center flex-wrap gap-2 pb-12">
     {#if wordFound}
-    <h3 in:fade class="text-3xl card-letter-font w-full text-center">Words</h3>
+      <h3 in:fade class="text-3xl card-letter-font w-full text-center">
+        Words
+      </h3>
     {/if}
     <div
       class="flex w-full justify-between md:justify-center flex-wrap gap-12 pb-10"
@@ -118,7 +120,9 @@
       {/each}
     </div>
     {#if wordFound}
-    <h3 in:fade class="text-3xl card-letter-font w-full text-center">Throwaway</h3>
+      <h3 in:fade class="text-3xl card-letter-font w-full text-center">
+        Throwaway
+      </h3>
     {/if}
     <div class="flex justify-center gap-4 pb-10">
       {#each playerCards.filter((card) => card.status === CardStatus.THROWAWAY) as card (card.id)}
@@ -132,7 +136,7 @@
       {/each}
     </div>
     {#if wordFound}
-    <h3 in:fade class="text-3xl card-letter-font w-full text-center">Lose</h3>
+      <h3 in:fade class="text-3xl card-letter-font w-full text-center">Lose</h3>
     {/if}
     <div class="flex gap-4 flex-wrap w-full justify-center pb-10">
       {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}

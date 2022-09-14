@@ -6,10 +6,10 @@ export default class Hand {
   wordsTemp: string[]
   throwawayTemp: string
   ID = 1
-  constructor(playerCardsExcludingThrowaway: string, words: string[], throwawayLetter: string, WORD_SCORES ) {
-    this.playerCards = Array.from(playerCardsExcludingThrowaway + throwawayLetter).map(lett => {return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} })
+  constructor(playerCardsExcludingThrowaway: string, words: string[], throwawayLetter: string, WORD_SCORES) {
+    this.playerCards = Array.from(playerCardsExcludingThrowaway + throwawayLetter).map(lett => { return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING } })
     this.words = []
-   
+
     this.wordsTemp = words
     this.throwawayTemp = throwawayLetter
   }
@@ -18,11 +18,11 @@ export default class Hand {
     const foundLettersIndex = [] as number[]
 
     this.wordsTemp.forEach(word => {
-      const group: LetterGroup = {word: []}
+      const group: LetterGroup = { word: [] }
       Array.from(word).forEach(letter => {
         const card = this.playerCards.find((c, index) => {
           const found = !foundLettersIndex.includes(index) && c.character === letter
-          if(found) {
+          if (found) {
             foundLettersIndex.push(index)
             return true
           }
@@ -54,7 +54,7 @@ export default class Hand {
     this.playerCards.forEach(card => {
       const index = remainingCards.findIndex(rc => rc.character === card.character)
 
-      if(index > -1 && card.status === CardStatus.PENDING) {
+      if (index > -1 && card.status === CardStatus.PENDING) {
         card.status = CardStatus.LOSE
         remainingCards.splice(index, 1)
       }
@@ -62,7 +62,7 @@ export default class Hand {
   }
 
   totalScore(): number {
-      return this.words.reduce((total,group) => total += group.word.reduce((score, card) => score += card.score, 0), 0)
+    return this.words.reduce((total, group) => total += group.word.reduce((score, card) => score += card.score, 0), 0)
   }
 
   newId() {
