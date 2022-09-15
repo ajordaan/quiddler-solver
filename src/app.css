@@ -49,3 +49,28 @@ body {
 .card-letter-font {
   font-family: Censcbk, serif;
 }
+
+.button-loading-state {
+  padding: 0.5rem !important
+}
+
+.loader {
+  width: 2rem;
+  height: 2rem;
+  border: 5px dotted #FFF;
+  background-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-sizing: border-box;
+  animation: rotation 2s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+} 

@@ -41,10 +41,6 @@ export default class WordFinder {
     return WORD_SCORES;
   }
 
-  static uid() {
-    return this.id++
-  }
-
   letters: string
   WORD_LIST: string[]
   RESULT_SIZE = 5
@@ -54,9 +50,9 @@ export default class WordFinder {
     this.WORD_LIST = wordList
   }
 
-  getPlayableHand() {
+  getPlayableHandInfo() {
     const variations = this.getThrowawayVariations()
-    const topWords = []
+    const topWords: {words: string[], score: number, playerLetters: string, throwaway: string}[] = []
     variations.forEach(variation => {
   
       const validWords = this.findValidWords(variation.includedLetters)
@@ -68,28 +64,14 @@ export default class WordFinder {
      
     })
     
-    
     const topWord =  topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
 
-    let remainingLetters: string[] = Array.from(topWord.playerLetters)
-    if(topWord) {
-      const groups: LetterGroup[] = []
-      topWord.words.forEach(w => {
-        const cardLetters: CardLetter[] = []
-        for(let lett of w) {
-          cardLetters.push({ id: WordFinder.uid(), character: lett, score: WORD_SCORES[lett], status: CardStatus.SCORED })
-        }
-
-        groups.push({word: cardLetters})
-      })
-      
-      return new Hand(topWord.playerLetters,topWord.words, topWord.throwaway, WORD_SCORES)
-
-    }
+    return topWord
 
   }
 
   findValidWords(letters) {
+    console.log('find valid words')
     if (letters.length > 10) {
       console.log('Too many letters')
       return
@@ -107,7 +89,8 @@ export default class WordFinder {
 
   }
 
-  getWordWithHighestScore(letters, validWords) {
+  getWordWithHighestScore(letters, validWords): {words: string[], score: number} {
+    console.log('get words with highest score')
     const validWordsWithScore = this.getValidWordsWithScore(validWords)
     const letterGroups = []
     for (const wordScore of validWordsWithScore) {
@@ -130,7 +113,7 @@ export default class WordFinder {
     const filteredGroups = letterGroups.map(group => {
       const groupScore = group.reduce((total, wordScore) => total += wordScore.score, 0)
       const groupWords = group.map(wordScore => wordScore.word)
-      return { id: WordFinder.uid(), words: groupWords, score: groupScore }
+      return { words: groupWords, score: groupScore }
 
     })
 
@@ -147,7 +130,7 @@ export default class WordFinder {
     if (topWord.score < topGroups[0]?.score)
       return topGroups[0]
 
-    return { id: WordFinder.uid(), words: [topWord.word], score: topWord.score }
+    return { words: [topWord.word], score: topWord.score }
   }
 
   getThrowawayVariations() {

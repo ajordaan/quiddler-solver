@@ -3,21 +3,16 @@ import { CardLetter, CardStatus, LetterGroup } from "./types";
 export default class Hand {
   words: LetterGroup[];
   playerCards: CardLetter[];
-  wordsTemp: string[]
-  throwawayTemp: string
-  ID = 1
-  constructor(playerCardsExcludingThrowaway: string, words: string[], throwawayLetter: string, WORD_SCORES ) {
-    this.playerCards = Array.from(playerCardsExcludingThrowaway + throwawayLetter).map(lett => {return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} })
+  ID = 1;
+  constructor(playerLetters: string, WORD_SCORES ) {
+    this.playerCards = Array.from(playerLetters).map(lett => {return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} })
     this.words = []
-   
-    this.wordsTemp = words
-    this.throwawayTemp = throwawayLetter
   }
 
-  setScoredWords() {
+  setScoredWords(scoredWords: string[]) {
     const foundLettersIndex = [] as number[]
 
-    this.wordsTemp.forEach(word => {
+    scoredWords.forEach(word => {
       const group: LetterGroup = {word: []}
       Array.from(word).forEach(letter => {
         const card = this.playerCards.find((c, index) => {
@@ -37,8 +32,8 @@ export default class Hand {
     })
   }
 
-  setThrowAwayCard() {
-    const card = this.playerCards.find(c => c.character === this.throwawayTemp)
+  setThrowAwayCard(letter) {
+    const card = this.playerCards.find(c => c.character === letter)
     card.status = CardStatus.THROWAWAY
   }
 
