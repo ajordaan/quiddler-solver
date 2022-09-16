@@ -7,6 +7,7 @@
   import scrabbleWordList from "./scrabble_word_list.json";
   import { CardLetter, CardStatus, LetterGroup } from "./types";
   import WordFinder from "./WordFinder";
+  import WordDictionary from "./WordDictionary";
 
   const [send, receive] = crossfade({
     duration: (d) => Math.sqrt(d * 3000),
@@ -33,14 +34,16 @@
   let wordFound = false;
   let loading = false;
   let timeoutLength = 2000;
-  let scoreString = ''
+  let scoreString = "";
+
+  let wordDictionary = new WordDictionary()
 
   function search() {
-    console.log('card statuses')
-    console.log('PENDING = ' + CardStatus.PENDING)
-    console.log('Scored = ' + CardStatus.SCORED)
-    console.log('LOSE = ' + CardStatus.LOSE)
-    console.log('THROWAWAY = ' + CardStatus.THROWAWAY)
+    console.log("card statuses");
+    console.log("PENDING = " + CardStatus.PENDING);
+    console.log("Scored = " + CardStatus.SCORED);
+    console.log("LOSE = " + CardStatus.LOSE);
+    console.log("THROWAWAY = " + CardStatus.THROWAWAY);
     loading = true;
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
     clear();
@@ -56,8 +59,11 @@
         playerCards = playerCards;
         handWords = handWords;
         wordFound = true;
-        console.log({playerCards})
-        scoreString = hand.loseScore === 0 ? hand.totalScore + '' : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`
+        console.log({ playerCards });
+        scoreString =
+          hand.loseScore === 0
+            ? hand.totalScore + ""
+            : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`;
         loading = false;
       }, 2000);
     }, 100);
@@ -70,6 +76,7 @@
     handWords = [];
     wordFound = false;
   }
+
 </script>
 
 <main class="flex flex-col p-8 w-screen items-center justify-center">
@@ -138,23 +145,30 @@
   <div class="flex justify-center flex-wrap gap-2 pb-12">
     {#if wordFound}
       <h3 in:fade class="text-3xl card-letter-font w-full text-center">
-        Words {hand.loseScore > 0 ? `(${hand.wordScore})` : ''}
+        Words {hand.loseScore > 0 ? `(${hand.wordScore})` : ""}
       </h3>
     {/if}
     <div
       class="flex w-full justify-between md:justify-center flex-wrap gap-12 pb-10"
     >
       {#each handWords as group}
-        <div class="flex gap-2 flex-col md:flex-row">
-          {#each group.word as card (card.id)}
-            <div
-              in:receive={{ key: card.id }}
-              out:send={{ key: card.id }}
-              animate:flip={{ duration: (d) => d * 2000 }}
-            >
-              <LetterCard letter={card.character} score={card.score} />
-            </div>
-          {/each}
+        <div class="">
+          <div class="flex gap-2 flex-col md:flex-row">
+            {#each group.word as card (card.id)}
+              <div
+                in:receive={{ key: card.id }}
+                out:send={{ key: card.id }}
+                animate:flip={{ duration: (d) => d * 2000 }}
+              >
+                <LetterCard letter={card.character} score={card.score} />
+              </div>
+            {/each}
+          </div>
+          {#await wordDictionary.defineWord(group.word)}
+          
+          {:then definition} 
+            <p style={`width: ${7 * group.word.length}rem`} class="pt-2" transition:fade>{definition}</p>
+          {/await}
         </div>
       {/each}
     </div>
@@ -175,7 +189,9 @@
       {/each}
     </div>
     {#if wordFound && hand.loseScore > 0}
-      <h3 in:fade class="text-3xl card-letter-font w-full text-center">Lose ({hand.loseScore})</h3>
+      <h3 in:fade class="text-3xl card-letter-font w-full text-center">
+        Lose ({hand.loseScore})
+      </h3>
     {/if}
     <div class="flex gap-4 flex-wrap w-full justify-center pb-10">
       {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
