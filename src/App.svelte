@@ -36,11 +36,14 @@
   let scoreString = ''
 
   function search() {
+    console.log('card statuses')
+    console.log('PENDING = ' + CardStatus.PENDING)
+    console.log('Scored = ' + CardStatus.SCORED)
+    console.log('LOSE = ' + CardStatus.LOSE)
+    console.log('THROWAWAY = ' + CardStatus.THROWAWAY)
     loading = true;
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
-    timeoutLength = playerLetters.length > 7 ? 1 : 2000;
     clear();
-    console.log({ timeoutLength });
     setTimeout(() => {
       hand = wordFinder.getPlayableHand();
       playerCards = hand.playerCards;
@@ -53,9 +56,10 @@
         playerCards = playerCards;
         handWords = handWords;
         wordFound = true;
+        console.log({playerCards})
         scoreString = hand.loseScore === 0 ? hand.totalScore + '' : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`
         loading = false;
-      }, timeoutLength);
+      }, 2000);
     }, 100);
   }
 
