@@ -61,8 +61,16 @@ export default class Hand {
     })
   }
 
-  totalScore(): number {
+  get wordScore(): number {
     return this.words.reduce((total, group) => total += group.word.reduce((score, card) => score += card.score, 0), 0)
+  }
+
+  get loseScore(): number {
+    return this.playerCards.filter(card => card.status === CardStatus.LOSE).reduce((score, card) => score += card.score, 0)
+  }
+
+  get totalScore(): number {
+    return this.wordScore - this.loseScore
   }
 
   newId() {

@@ -32,12 +32,15 @@
   let handWords: LetterGroup[] = [];
   let wordFound = false;
   let loading = false;
+  let timeoutLength = 2000;
+  let scoreString = ''
 
   function search() {
     loading = true;
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
+    timeoutLength = playerLetters.length > 7 ? 1 : 2000;
     clear();
-
+    console.log({ timeoutLength });
     setTimeout(() => {
       hand = wordFinder.getPlayableHand();
       playerCards = hand.playerCards;
@@ -50,8 +53,9 @@
         playerCards = playerCards;
         handWords = handWords;
         wordFound = true;
+        scoreString = hand.loseScore === 0 ? hand.totalScore + '' : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`
         loading = false;
-      }, 2000);
+      }, timeoutLength);
     }, 100);
   }
 
@@ -107,6 +111,11 @@
     </button>
   </div>
 
+  {#if wordFound}
+    <h3 in:fade class="pt-4 text-5xl card-letter-font w-full text-center">
+      {scoreString}
+    </h3>
+  {/if}
   <div class="flex gap-4 pt-12 flex-wrap w-full justify-center">
     {#if hand}
       {#each playerCards.filter((card) => card.status === CardStatus.PENDING) as card (card.id)}
@@ -125,7 +134,7 @@
   <div class="flex justify-center flex-wrap gap-2 pb-12">
     {#if wordFound}
       <h3 in:fade class="text-3xl card-letter-font w-full text-center">
-        Words
+        Words {hand.loseScore > 0 ? `(${hand.wordScore})` : ''}
       </h3>
     {/if}
     <div
@@ -161,8 +170,8 @@
         </div>
       {/each}
     </div>
-    {#if wordFound}
-      <h3 in:fade class="text-3xl card-letter-font w-full text-center">Lose</h3>
+    {#if wordFound && hand.loseScore > 0}
+      <h3 in:fade class="text-3xl card-letter-font w-full text-center">Lose ({hand.loseScore})</h3>
     {/if}
     <div class="flex gap-4 flex-wrap w-full justify-center pb-10">
       {#each playerCards.filter((card) => card.status === CardStatus.LOSE) as card (card.id)}
