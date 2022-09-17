@@ -1,5 +1,5 @@
 
-import { CardLetter} from "./types";
+import type { CardLetter} from "./types";
 export default class WordDictionary {
   API_KEY = ''
 
@@ -14,7 +14,6 @@ export default class WordDictionary {
   }
 
   definitionUrl(word) {
-
     return `https://dictionaryapi.com/api/v3/references/collegiate/json/${encodeURI(word)}?key=${this.API_KEY}`.trim()
   }
 

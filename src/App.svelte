@@ -39,11 +39,6 @@
   let wordDictionary = new WordDictionary()
 
   function search() {
-    console.log("card statuses");
-    console.log("PENDING = " + CardStatus.PENDING);
-    console.log("Scored = " + CardStatus.SCORED);
-    console.log("LOSE = " + CardStatus.LOSE);
-    console.log("THROWAWAY = " + CardStatus.THROWAWAY);
     loading = true;
     const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
     clear();
@@ -66,7 +61,7 @@
             : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`;
         loading = false;
       }, 2000);
-    }, 100);
+    }, 500);
   }
 
   function clear() {
@@ -164,10 +159,8 @@
               </div>
             {/each}
           </div>
-          {#await wordDictionary.defineWord(group.word)}
-          
-          {:then definition} 
-            <p style={`width: ${7 * group.word.length}rem`} class="pt-2" transition:fade>{definition}</p>
+          {#await wordDictionary.defineWord(group.word) then definition}
+          <p style={`width: ${7 * group.word.length}rem`} class="pt-2" transition:fade>{definition}</p>
           {/await}
         </div>
       {/each}
