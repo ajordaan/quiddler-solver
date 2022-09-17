@@ -54,10 +54,10 @@ export default class WordFinder {
     const variations = this.getThrowawayVariations()
     const topWords: {words: string[], score: number, playerLetters: string, throwaway: string}[] = []
     variations.forEach(variation => {
-  
+
       const validWords = this.findValidWords(variation.includedLetters)
-      if(validWords.length > 0) {
-        const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords )
+      if (validWords.length > 0) {
+        const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords)
 
         topWords.push({ ...bestWord, playerLetters: variation.includedLetters, throwaway: variation.excludedLetter })
       }
@@ -82,7 +82,7 @@ export default class WordFinder {
 
 
     // console.log({ allPermutations: allPermutations.length })
-    
+
     const validWords = allPermutations.filter(perm => this.validWord(perm.join('')))
     // console.log({ validWords: validWords })
     return validWords
@@ -120,10 +120,10 @@ export default class WordFinder {
     const topGroups = filteredGroups.sort(this.compareWordScores)
 
     // console.log(JSON.stringify(topGroups))
-    
+
     const topWord = validWordsWithScore[0]
 
-//    console.log({topWord})
+    //    console.log({topWord})
 
     // console.log(topWord)
     // console.log(topGroups[0])
