@@ -6,8 +6,9 @@
   import LetterCard from "./lib/LetterCard.svelte";
   import scrabbleWordList from "./scrabble_word_list.json";
   import { CardLetter, CardStatus, LetterGroup } from "./types";
-  import WordFinder from "./WordFinder";
+  import WordFinderStr from "./WordFinder?raw";
   import WordDictionary from "./WordDictionary";
+  import { WORD_SCORES } from "./utils";
 
   const [send, receive] = crossfade({
     duration: (d) => Math.sqrt(d * 3000),
@@ -35,47 +36,47 @@
   let loading = false;
   let timeoutLength = 2000;
   let scoreString = "";
-  let wordFinder = null;
   let transitionedCount = 0;
+  let worker = null;
 
-  let wordDictionary = new WordDictionary()
+  let wordDictionary = new WordDictionary();
 
-  async function search() {
+  function search() {
     transitionedCount = 0;
     loading = true;
     hand = null;
     playerCards = [];
     handWords = [];
 
-    wordFinder = new WordFinder(playerLetters, scrabbleWordList);
-    hand = new Hand(playerLetters, WordFinder.WORD_SCORES);
+    hand = new Hand(playerLetters, WORD_SCORES);
 
     playerCards = hand.playerCards;
     console.log(playerCards);
     handWords = hand.words;
 
-    if(transitionedCount < playerCards.length) {
-      setTimeout(getWords, 2000)
-    }
-    else {
-      getWords()
+    if (transitionedCount < playerCards.length) {
+      setTimeout(getWords, 2000);
+    } else {
+      getWords();
     }
   }
 
   function getWords() {
-    const info = wordFinder.getPlayableHandInfo();
+    worker.postMessage({ letters: playerLetters, wordList: scrabbleWordList });
+  }
 
+  function setWords(info) {
     hand.setThrowAwayCard(info.throwaway);
     hand.setScoredWords(info.words);
     hand.setLoseCards();
     loading = false;
     scoreString =
-          hand.loseScore === 0
-            ? hand.totalScore + ""
-            : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`;
+      hand.loseScore === 0
+        ? hand.totalScore + ""
+        : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`;
     playerCards = playerCards;
     handWords = handWords;
-    wordFound = true
+    wordFound = true;
   }
 
   function clear() {
@@ -85,6 +86,31 @@
     handWords = [];
     wordFound = false;
   }
+
+  function createWorker() {
+    const blob = new Blob([WordFinderStr]);
+    const blobURL = window.URL.createObjectURL(blob);
+    
+    worker = new Worker(blobURL);
+    worker.onmessage = (event) => {
+      const message = event.data;
+
+      if (message.messageType == "result") {
+        console.log("FINISHED SEARCH!!");
+        console.log({ messageD: message.data });
+        setWords(message.data);
+      } else if (message.messageType == "progress") {
+        console.log("Progress:");
+
+        console.log({ message: message.data });
+      }
+    };
+    worker.onerror = () => {
+      console.log("worker error");
+    };
+  }
+
+  createWorker();
 </script>
 
 <main class="flex flex-col p-8 w-screen items-center justify-center">
@@ -95,7 +121,11 @@
   </h1>
 
   <div class="flex flex-col items-center justify-center lg:w-1/3 [&>*]:m-3">
-    <input class="h-14 rounded text-3xl" bind:value={playerLetters} />
+    <input
+      class="h-14 rounded text-3xl"
+      bind:value={playerLetters}
+      maxlength="11"
+    />
     <button
       class="block px-4 py-3
     text-sm font-semibold 
@@ -173,7 +203,13 @@
             {/each}
           </div>
           {#await wordDictionary.defineWord(group.word) then definition}
-          <p style={`width: ${7 * group.word.length}rem`} class="pt-2" transition:fade>{definition}</p>
+            <p
+              style={`width: ${7 * group.word.length}rem`}
+              class="pt-2"
+              transition:fade
+            >
+              {definition}
+            </p>
           {/await}
         </div>
       {/each}

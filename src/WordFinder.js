@@ -1,3 +1,11 @@
+onmessage = function(event) {  
+  const wordFinder = new WordFinder(event.data.letters, event.data.wordList)
+  const word = wordFinder.getPlayableHandInfo();
+  postMessage(
+   { messageType: "result", data: word }
+  );
+};
+
 const WORD_SCORES = {
   a: 2,
   b: 8,
@@ -31,66 +39,51 @@ const WORD_SCORES = {
   th: 9,
   qu: 9
 }
-import Hand from './Hand'
-import { CardLetter, CardStatus, LetterGroup } from './types';
-export default class WordFinder {
-
-  static id = 1
+ class WordFinder {
 
   static get WORD_SCORES() {
     return WORD_SCORES;
   }
 
-  letters: string
-  WORD_LIST: string[]
-  RESULT_SIZE = 5
-
-  constructor(letters: string, wordList) {
+  constructor(letters, wordList) {
     this.letters = letters
     this.WORD_LIST = wordList
   }
 
   getPlayableHandInfo() {
     const variations = this.getThrowawayVariations()
-    const topWords: {words: string[], score: number, playerLetters: string, throwaway: string}[] = []
+    const topWords = []
+    let bestWord = null
     variations.forEach(variation => {
 
       const validWords = this.findValidWords(variation.includedLetters)
+      bestWord = null
       if (validWords.length > 0) {
-        const bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords)
-
+         bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords)
         topWords.push({ ...bestWord, playerLetters: variation.includedLetters, throwaway: variation.excludedLetter })
       }
+
+      postMessage({ messageType: 'progress', data: bestWord})
      
     })
     
     const topWord =  topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
 
     return topWord
-
   }
 
   findValidWords(letters) {
-    console.log('find valid words')
     if (letters.length > 10) {
       console.log('Too many letters')
       return
     }
-
     const combinations = this.getCombinations(letters)
     const allPermutations = this.getAllPermutations(combinations)
-
-
-    // console.log({ allPermutations: allPermutations.length })
-
     const validWords = allPermutations.filter(perm => this.validWord(perm.join('')))
-    // console.log({ validWords: validWords })
     return validWords
-
   }
 
-  getWordWithHighestScore(letters, validWords): {words: string[], score: number} {
-    console.log('get words with highest score')
+  getWordWithHighestScore(letters, validWords) {
     const validWordsWithScore = this.getValidWordsWithScore(validWords)
     const letterGroups = []
     for (const wordScore of validWordsWithScore) {
@@ -102,9 +95,6 @@ export default class WordFinder {
       }
       const groups = this.buildWordGroup(letters, remainingLetters, validWordsWithScore, [wordScore])
       if (groups && groups.length > 1) {
-        // console.log(' ---------- GROUP -----------')
-        // console.log(groups)
-        // console.log(' ----------------------------')
         letterGroups.push(groups)
       }
 
@@ -119,14 +109,8 @@ export default class WordFinder {
 
     const topGroups = filteredGroups.sort(this.compareWordScores)
 
-    // console.log(JSON.stringify(topGroups))
-
     const topWord = validWordsWithScore[0]
 
-    //    console.log({topWord})
-
-    // console.log(topWord)
-    // console.log(topGroups[0])
     if (topWord.score < topGroups[0]?.score)
       return topGroups[0]
 
@@ -259,27 +243,19 @@ export default class WordFinder {
     let startIndex = 0;
     let endIndex = array.length - 1;
     while (startIndex <= endIndex) {
-      // Define Middle Index (This will change when comparing )
       let middleIndex = Math.floor((startIndex + endIndex) / 2);
-      // Compare Middle Index with Target for match
       if (target === array[middleIndex]) {
         return true
       }
-      // Search Right Side Of Array
       if (target > array[middleIndex]) {
-        // Assign Start Index and increase the Index by 1 to narrow search
         startIndex = middleIndex + 1;
       }
-      // Search Left Side Of Array
       if (target < array[middleIndex]) {
-        // Assign End Index and increase the Index by 1 to narrow search
         endIndex = middleIndex - 1;
       }
-      // Not found in this iteration of the loop. Looping again.
       else {
       }
     }
-    // If Target Is Not Found
     return false
   }
 }
