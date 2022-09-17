@@ -35,33 +35,47 @@
   let loading = false;
   let timeoutLength = 2000;
   let scoreString = "";
+  let wordFinder = null;
+  let transitionedCount = 0;
 
   let wordDictionary = new WordDictionary()
 
-  function search() {
+  async function search() {
+    transitionedCount = 0;
     loading = true;
-    const wordFinder = new WordFinder(playerLetters, scrabbleWordList);
-    clear();
-    setTimeout(() => {
-      hand = wordFinder.getPlayableHand();
-      playerCards = hand.playerCards;
-      handWords = hand.words;
+    hand = null;
+    playerCards = [];
+    handWords = [];
 
-      setTimeout(() => {
-        hand.setThrowAwayCard();
-        hand.setScoredWords();
-        hand.setLoseCards();
-        playerCards = playerCards;
-        handWords = handWords;
-        wordFound = true;
-        console.log({ playerCards });
-        scoreString =
+    wordFinder = new WordFinder(playerLetters, scrabbleWordList);
+    hand = new Hand(playerLetters, WordFinder.WORD_SCORES);
+
+    playerCards = hand.playerCards;
+    console.log(playerCards);
+    handWords = hand.words;
+
+    if(transitionedCount < playerCards.length) {
+      setTimeout(getWords, 2000)
+    }
+    else {
+      getWords()
+    }
+  }
+
+  function getWords() {
+    const info = wordFinder.getPlayableHandInfo();
+
+    hand.setThrowAwayCard(info.throwaway);
+    hand.setScoredWords(info.words);
+    hand.setLoseCards();
+    loading = false;
+    scoreString =
           hand.loseScore === 0
             ? hand.totalScore + ""
             : `${hand.wordScore} - ${hand.loseScore} = ${hand.totalScore}`;
-        loading = false;
-      }, 2000);
-    }, 500);
+    playerCards = playerCards;
+    handWords = handWords;
+    wordFound = true
   }
 
   function clear() {
