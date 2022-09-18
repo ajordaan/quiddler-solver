@@ -79,7 +79,7 @@
   }
 
   function getWords() {
-    worker.postMessage({ letters: playerLetters, wordList: scrabbleWordList });
+    worker.postMessage({ letters: playerLetters, wordList: scrabbleWordList, wordScores: WORD_SCORES });
   }
 
   function setWords(info) {

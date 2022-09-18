@@ -1,53 +1,16 @@
-onmessage = function(event) {  
-  const wordFinder = new WordFinder(event.data.letters, event.data.wordList)
+onmessage = function (event) {
+  const wordFinder = new WordFinder(event.data.letters, event.data.wordList, event.data.wordScores)
   const word = wordFinder.getPlayableHandInfo();
   postMessage(
-   { messageType: "result", data: word }
+    { messageType: "result", data: word }
   );
 };
+class WordFinder {
 
-const WORD_SCORES = {
-  a: 2,
-  b: 8,
-  c: 5,
-  d: 2,
-  e: 2,
-  f: 6,
-  g: 6,
-  h: 7,
-  i: 2,
-  j: 13,
-  k: 8,
-  l: 3,
-  m: 5,
-  n: 5,
-  o: 2,
-  p: 6,
-  q: 15,
-  r: 5,
-  s: 3,
-  t: 3,
-  u: 4,
-  v: 11,
-  w: 10,
-  x: 12,
-  y: 4,
-  z: 14,
-  er: 7,
-  cl: 10,
-  in: 7,
-  th: 9,
-  qu: 9
-}
- class WordFinder {
-
-  static get WORD_SCORES() {
-    return WORD_SCORES;
-  }
-
-  constructor(letters, wordList) {
+  constructor(letters, wordList, wordScores) {
     this.letters = letters
     this.WORD_LIST = wordList
+    this.WORD_SCORES = wordScores
   }
 
   getPlayableHandInfo() {
@@ -59,15 +22,15 @@ const WORD_SCORES = {
       const validWords = this.findValidWords(variation.includedLetters)
       bestWord = null
       if (validWords.length > 0) {
-         bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords)
+        bestWord = this.getWordWithHighestScore(variation.includedLetters, validWords)
         topWords.push({ ...bestWord, playerLetters: variation.includedLetters, throwaway: variation.excludedLetter })
       }
 
-      postMessage({ messageType: 'progress', data: bestWord})
-     
+      postMessage({ messageType: 'progress', data: bestWord })
+
     })
-    
-    const topWord =  topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
+
+    const topWord = topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
 
     return topWord
   }
@@ -166,7 +129,7 @@ const WORD_SCORES = {
 
   calculateWordScore(word) {
     let score = 0
-    word.forEach(letter => score += WORD_SCORES[letter])
+    word.forEach(letter => score += this.WORD_SCORES[letter])
 
     return score
   }
