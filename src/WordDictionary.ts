@@ -1,5 +1,6 @@
 
 import type { CardLetter} from "./types";
+import { convertPlaceHoldersToDoubleLetters } from "./utils";
 export default class WordDictionary {
   API_KEY = ''
 
@@ -20,8 +21,9 @@ export default class WordDictionary {
   async defineWord(letters: CardLetter[]) {
     
     const word = letters.reduce((str, card) => str += card.character, '' )
+    const convertedWord = convertPlaceHoldersToDoubleLetters(word)
     
-    const url = this.definitionUrl(word)
+    const url = this.definitionUrl(convertedWord)
 console.log({url})
     const res = await fetch(url)
     const json = await res.json()
