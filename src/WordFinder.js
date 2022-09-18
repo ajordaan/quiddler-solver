@@ -5,12 +5,58 @@ onmessage = function (event) {
     { messageType: "result", data: word }
   );
 };
+
+const DOUBLE_LETTER_PLACEHOLDERS = {
+  er: '!',
+  cl: '@',
+  in: '#',
+  th: '$',
+  qu: '%'
+}
+const PLACEHOLDER_DOUBLE_LETTERS = {
+  '@': 'cl',
+  '!': 'er',
+  '#': 'in',
+  '$': 'th',
+  '%': 'qu'
+}
 class WordFinder {
 
   constructor(letters, wordList, wordScores) {
-    this.letters = letters
+    this.letters = this.convertDoubleLettersToPlaceholders(letters)
     this.WORD_LIST = wordList
     this.WORD_SCORES = wordScores
+  }
+
+  convertDoubleLettersToPlaceholders(word) {
+    let wordWithPlaceHolders = ''
+    for (let i = 0; i < word.length; i++) {
+      if (word[i] === '(') {
+        const doubleLetter = word.substring(i + 1, word.indexOf(')', i))
+        wordWithPlaceHolders += DOUBLE_LETTER_PLACEHOLDERS[doubleLetter]
+        i = word.indexOf(')', i)
+      }
+      else {
+        wordWithPlaceHolders += word[i]
+      }
+    }
+
+    return wordWithPlaceHolders
+  }
+
+  convertPlaceHoldersToDoubleLetters(word) {
+    let wordWithoutPlaceholders = ''
+
+    for (const letter of word) {
+      if (letter in PLACEHOLDER_DOUBLE_LETTERS) {
+        wordWithoutPlaceholders += PLACEHOLDER_DOUBLE_LETTERS[letter]
+      }
+      else {
+        wordWithoutPlaceholders += letter
+      }
+    }
+
+    return wordWithoutPlaceholders
   }
 
   getPlayableHandInfo() {
@@ -60,7 +106,6 @@ class WordFinder {
       if (groups && groups.length > 1) {
         letterGroups.push(groups)
       }
-
     }
 
     const filteredGroups = letterGroups.map(group => {
@@ -135,7 +180,7 @@ class WordFinder {
   }
 
   validWord(word) {
-    return word.length > 1 && this.binarySearch(this.WORD_LIST, word)
+    return word.length > 1 && this.binarySearch(this.WORD_LIST, this.convertPlaceHoldersToDoubleLetters(word))
   }
 
   getAllPermutations(groups) {

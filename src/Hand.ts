@@ -1,11 +1,16 @@
 import { CardLetter, CardStatus, LetterGroup } from "./types";
-
+import { convertPlaceHoldersToDoubleLetters, convertDoubleLettersToPlaceholders } from "./utils"
 export default class Hand {
   words: LetterGroup[];
   playerCards: CardLetter[];
   ID = 1;
   constructor(playerLetters: string, WORD_SCORES ) {
-    this.playerCards = Array.from(playerLetters).map(lett => {return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} })
+    const convertedLetters = convertDoubleLettersToPlaceholders(playerLetters)
+    this.playerCards = Array.from(convertedLetters).map(lett => {
+      
+      return { id: this.newId(), character: lett, score: WORD_SCORES[lett], status: CardStatus.PENDING} 
+    
+    })
     this.words = []
   }
 

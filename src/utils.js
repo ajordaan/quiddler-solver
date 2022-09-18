@@ -29,6 +29,56 @@ export const WORD_SCORES = {
   cl: 10,
   in: 7,
   th: 9,
-  qu: 9
+  qu: 9,
+  '!': 7,
+  '@': 10,
+  '#': 7,
+  '$': 9,
+  '%': 9
 }
 
+export const DOUBLE_LETTER_PLACEHOLDERS = {
+  er: '!',
+  cl: '@',
+  in: '#',
+  th: '$',
+  qu: '%'
+}
+export const PLACEHOLDER_DOUBLE_LETTERS = {
+  '@': 'cl',
+  '!': 'er',
+  '#': 'in',
+  '$': 'th',
+  '%': 'qu'
+}
+
+export function convertPlaceHoldersToDoubleLetters(word) {
+  let wordWithoutPlaceholders = ''
+
+  for (const letter of word) {
+    if (letter in PLACEHOLDER_DOUBLE_LETTERS) {
+      wordWithoutPlaceholders += PLACEHOLDER_DOUBLE_LETTERS[letter]
+    }
+    else {
+      wordWithoutPlaceholders += letter
+    }
+  }
+
+  return wordWithoutPlaceholders
+}
+
+export function convertDoubleLettersToPlaceholders(word) {
+  let wordWithPlaceHolders = ''
+  for (let i = 0; i < word.length; i++) {
+    if (word[i] === '(') {
+      const doubleLetter = word.substring(i + 1, word.indexOf(')', i))
+      wordWithPlaceHolders += DOUBLE_LETTER_PLACEHOLDERS[doubleLetter]
+      i = word.indexOf(')', i)
+    }
+    else {
+      wordWithPlaceHolders += word[i]
+    }
+  }
+
+  return wordWithPlaceHolders
+}
