@@ -9,6 +9,8 @@
   import WordFinderStr from "./WordFinder?raw";
   import WordDictionary from "./WordDictionary";
   import { WORD_SCORES } from "./utils";
+  import { tweened } from "svelte/motion";
+  import { cubicOut } from "svelte/easing";
 
   const [send, receive] = crossfade({
     duration: (d) => Math.sqrt(d * 3000),
@@ -38,21 +40,36 @@
   let scoreString = "";
   let transitionedCount = 0;
   let worker = null;
+  let minWordCountForProgressBar = 9;
+  let progressCount = 0;
+  let progress = null;
 
   let wordDictionary = new WordDictionary();
 
   function search() {
+    progress = tweened(0, {
+      duration: playerLetters.length > 7 ? 400 : 2000,
+      easing: cubicOut,
+    });
+
+    progress.set(0);
+
     transitionedCount = 0;
     loading = true;
     hand = null;
     playerCards = [];
     handWords = [];
+    progressCount = 0;
 
     hand = new Hand(playerLetters, WORD_SCORES);
 
     playerCards = hand.playerCards;
     console.log(playerCards);
     handWords = hand.words;
+
+    if (!(playerLetters.length > 7)) {
+      progress.set(100);
+    }
 
     if (transitionedCount < playerCards.length) {
       setTimeout(getWords, 2000);
@@ -90,7 +107,7 @@
   function createWorker() {
     const blob = new Blob([WordFinderStr]);
     const blobURL = window.URL.createObjectURL(blob);
-    
+
     worker = new Worker(blobURL);
     worker.onmessage = (event) => {
       const message = event.data;
@@ -100,8 +117,11 @@
         console.log({ messageD: message.data });
         setWords(message.data);
       } else if (message.messageType == "progress") {
+        progressCount++;
+        if (playerLetters.length > 7) {
+          progress.set(Math.ceil((progressCount / playerLetters.length) * 100));
+        }
         console.log("Progress:");
-
         console.log({ message: message.data });
       }
     };
@@ -121,10 +141,19 @@
   </h1>
 
   <div class="flex flex-col items-center justify-center lg:w-1/3 [&>*]:m-3">
+    {#if playerLetters.length > 10}
+      <div
+        class="p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800"
+        role="alert"
+      >
+        <span class="font-medium">Warning!</span> Searching for words over 10 letters
+        will take a loooong time
+      </div>
+    {/if}
     <input
       class="h-14 rounded text-3xl"
       bind:value={playerLetters}
-      maxlength="11"
+      maxlength="12"
     />
     <button
       class="block px-4 py-3
@@ -158,6 +187,14 @@
         Find Words
       {/if}
     </button>
+    {#if loading}
+      <div class="w-full bg-gray-200 rounded-full h-2.5 mb-4 dark:bg-gray-700">
+        <div
+          class="bg-indigo-600 h-2.5 rounded-full dark:bg-indigo-500"
+          style={`width: ${$progress}%`}
+        />
+      </div>
+    {/if}
   </div>
 
   {#if wordFound}
