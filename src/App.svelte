@@ -8,9 +8,10 @@
   import { CardLetter, CardStatus, LetterGroup } from "./types";
   import WordFinderStr from "./WordFinder?raw";
   import WordDictionary from "./WordDictionary";
-  import { WORD_SCORES } from "./utils";
+  import { WORD_SCORES, convertPlaceHoldersToDoubleLetters, PLACEHOLDER_DOUBLE_LETTERS } from "./utils";
   import { tweened } from "svelte/motion";
   import { cubicOut } from "svelte/easing";
+
 
   const [send, receive] = crossfade({
     duration: (d) => Math.sqrt(d * 3000),
@@ -211,7 +212,7 @@
           animate:flip={{ duration: (d) => d * 2000 }}
           on:introend={() => transitionedCount++}
         >
-          <LetterCard letter={card.character} score={card.score} />
+          <LetterCard letter={PLACEHOLDER_DOUBLE_LETTERS[card.character] || card.character} score={card.score} />
         </div>
       {/each}
     {/if}
@@ -235,7 +236,7 @@
                 out:send={{ key: card.id }}
                 animate:flip={{ duration: (d) => d * 2000 }}
               >
-                <LetterCard letter={card.character} score={card.score} />
+                <LetterCard letter={PLACEHOLDER_DOUBLE_LETTERS[card.character] || card.character} score={card.score} />
               </div>
             {/each}
           </div>

@@ -12,7 +12,7 @@
     <span class="text-2xl p-1 pb-0">{letter}</span>
     <span class="pl-1">{score}</span>
   </div>
-  <span class="text-center uppercase card-center-letter pt-6 pl-1 pr-1" class:card-center-letter--smaller="{largeLetters.includes(letter)}">{letter}</span>
+  <span class="text-center uppercase card-center-letter pt-6 pl-1 pr-1" class:card-center-letter--smallest="{letter.length === 2}" class:card-center-letter--smaller="{largeLetters.includes(letter)}">{letter}</span>
   <div class="flex flex-col rotate-180 uppercase card-letter-font">
     <span class="text-2xl p-1 pb-0">{letter}</span>
     <span class="pl-1">{score}</span>
