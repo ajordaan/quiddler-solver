@@ -6,7 +6,7 @@
   import LetterCard from "./lib/LetterCard.svelte";
   import scrabbleWordList from "./scrabble_word_list.json";
   import { CardLetter, CardStatus, LetterGroup } from "./types";
-  import WordFinderStr from "./WordFinder?raw";
+  import WordFinderStr from "./WordFinderWorker?raw";
   import WordDictionary from "./WordDictionary";
   import { WORD_SCORES, convertPlaceHoldersToDoubleLetters, PLACEHOLDER_DOUBLE_LETTERS } from "./utils";
   import { tweened } from "svelte/motion";
@@ -142,7 +142,7 @@
   </h1>
 
   <div class="flex flex-col items-center justify-center lg:w-1/3 [&>*]:m-3">
-    {#if playerLetters.length > 10}
+    {#if playerLetters.replaceAll(/\(*\)*/g, '').length > 10}
       <div
         class="p-4 mb-4 text-sm text-yellow-700 bg-yellow-100 rounded-lg dark:bg-yellow-200 dark:text-yellow-800"
         role="alert"
@@ -154,7 +154,7 @@
     <input
       class="h-14 rounded text-3xl"
       bind:value={playerLetters}
-      maxlength="12"
+      maxlength="25"
     />
     <button
       class="block px-4 py-3
@@ -264,7 +264,7 @@
           out:send={{ key: card.id }}
           animate:flip={{ duration: (d) => d * 2000 }}
         >
-          <LetterCard letter={card.character} score={card.score} />
+          <LetterCard letter={PLACEHOLDER_DOUBLE_LETTERS[card.character] || card.character} score={card.score} />
         </div>
       {/each}
     </div>

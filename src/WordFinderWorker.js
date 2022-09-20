@@ -72,11 +72,26 @@ class WordFinder {
         topWords.push({ ...bestWord, playerLetters: variation.includedLetters, throwaway: variation.excludedLetter })
       }
 
-      postMessage({ messageType: 'progress', data: bestWord })
+      postMessage({ messageType: 'progress', data: { ...bestWord, playerLetters: variation.includedLetters, throwaway: variation.excludedLetter } })
 
     })
 
-    const topWord = topWords.length > 0 ? topWords.sort(this.compareWordScores)[0] : null
+    const topWord = topWords.length > 0 ? topWords.sort((a, b) => {
+      if (a.score < b.score) {
+        return 1;
+      }
+      if (a.score > b.score) {
+        return -1;
+      }
+  
+      if (this.WORD_SCORES[a.throwaway] < this.WORD_SCORES[b.throwaway]) {
+        return 1;
+      }
+      if (this.WORD_SCORES[a.throwaway] > this.WORD_SCORES[b.throwaway]) {
+        return -1;
+      }
+      return 0;
+    })[0] : null
 
     return topWord
   }
@@ -244,6 +259,27 @@ class WordFinder {
     if (a.score > b.score) {
       return -1;
     }
+
+    return 0;
+  }
+
+  compareHandScores(a, b) {
+    const scores = this
+    console.log({a,b})
+    console.log('hello?: ' + scores)
+    if (a.score < b.score) {
+      return 1;
+    }
+    if (a.score > b.score) {
+      return -1;
+    }
+
+    // if (scores[a.throwaway] < scores[b.throwaway]) {
+    //   return 1;
+    // }
+    // if (scores[a.throwaway] > scores[b.throwaway]) {
+    //   return -1;
+    // }
     return 0;
   }
 
